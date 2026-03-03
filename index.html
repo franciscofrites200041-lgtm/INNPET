@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="INNPET - Plataforma inteligente de gestión veterinaria. Historiales clínicos, asistente IA y más.">
+  <title>INNPET — Gestión Veterinaria Inteligente</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='16' fill='%230d9488'/><text x='16' y='22' text-anchor='middle' fill='white' font-size='16' font-family='Inter'>IP</text></svg>">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+  <div class="app">
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-mark">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <path
+                d="M10 4a3 3 0 1 1-1 5.8A7 7 0 0 0 7 14c0 4.4 4 8 7 10 3-2 7-5.6 7-10a7 7 0 0 0-2-4.2A3 3 0 1 1 18 4a3 3 0 0 1 .5 1.5A9 9 0 0 1 21 14c0 5.5-5 10-7 11.5C12 24 7 19.5 7 14a9 9 0 0 1 2.5-8.5A3 3 0 0 1 10 4z"
+                fill="currentColor" />
+              <circle cx="9" cy="6" r="2" fill="currentColor" opacity="0.6" />
+              <circle cx="19" cy="6" r="2" fill="currentColor" opacity="0.6" />
+              <circle cx="14" cy="4" r="2.5" fill="currentColor" opacity="0.8" />
+              <circle cx="6" cy="10" r="1.5" fill="currentColor" opacity="0.5" />
+              <circle cx="22" cy="10" r="1.5" fill="currentColor" opacity="0.5" />
+            </svg>
+          </div>
+          <span class="logo-text">INNPET</span>
+        </div>
+        <button class="btn-new" id="newChatBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Nueva consulta
+        </button>
+      </div>
+
+      <nav class="sidebar-tabs">
+        <button class="tab active" id="navChats">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+          Consultas
+        </button>
+        <button class="tab" id="navRecords">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+            <rect x="8" y="2" width="8" height="4" rx="1" />
+          </svg>
+          Pacientes
+        </button>
+      </nav>
+
+      <div class="sidebar-list" id="sidebarContent"></div>
+
+      <div class="sidebar-footer">
+        <div class="conn-status">
+          <span class="dot" id="statusDotDb"></span>
+          <span id="statusTextDb">Base de datos</span>
+        </div>
+        <div class="conn-status">
+          <span class="dot" id="statusDot"></span>
+          <span id="statusText">Asistente IA</span>
+        </div>
+        <button class="btn-settings" id="settingsBtn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
+          Configuración
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="btn-icon sidebar-toggle" id="sidebarToggle">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+          <div class="topbar-brand">
+            <span class="brand-dot"></span>
+            <span class="brand-name">INNPET Asistente</span>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <button class="btn-outline" id="addRecordBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Nuevo paciente
+          </button>
+          <button class="btn-outline" id="recordsBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+            Historiales
+          </button>
+        </div>
+      </header>
+
+      <div class="chat-area" id="chatArea">
+        <!-- Welcome -->
+        <div class="welcome" id="welcomeScreen">
+          <div class="welcome-icon">
+            <svg width="48" height="48" viewBox="0 0 28 28" fill="none">
+              <path
+                d="M10 4a3 3 0 1 1-1 5.8A7 7 0 0 0 7 14c0 4.4 4 8 7 10 3-2 7-5.6 7-10a7 7 0 0 0-2-4.2A3 3 0 1 1 18 4a3 3 0 0 1 .5 1.5A9 9 0 0 1 21 14c0 5.5-5 10-7 11.5C12 24 7 19.5 7 14a9 9 0 0 1 2.5-8.5A3 3 0 0 1 10 4z"
+                fill="currentColor" />
+              <circle cx="9" cy="6" r="2" fill="currentColor" opacity="0.6" />
+              <circle cx="19" cy="6" r="2" fill="currentColor" opacity="0.6" />
+              <circle cx="14" cy="4" r="2.5" fill="currentColor" opacity="0.8" />
+              <circle cx="6" cy="10" r="1.5" fill="currentColor" opacity="0.5" />
+              <circle cx="22" cy="10" r="1.5" fill="currentColor" opacity="0.5" />
+            </svg>
+          </div>
+          <h1 class="welcome-title">INNPET</h1>
+          <p class="welcome-sub">Tu plataforma de gestión veterinaria con asistente inteligente integrado. Consultá
+            historiales, creá registros y gestioná pacientes desde un solo lugar.</p>
+          <div class="welcome-grid">
+            <div class="prompt-card" data-prompt="Dame el historial clínico completo de Max">
+              <div class="prompt-card-title">Consultar historial</div>
+              <div class="prompt-card-desc">Accedé al historial completo de un paciente</div>
+            </div>
+            <div class="prompt-card" data-prompt="Quiero agregar un nuevo paciente al sistema">
+              <div class="prompt-card-title">Registrar paciente</div>
+              <div class="prompt-card-desc">Creá un nuevo registro clínico desde cero</div>
+            </div>
+            <div class="prompt-card" data-prompt="Qué pacientes tienen alergias registradas?">
+              <div class="prompt-card-title">Revisar alergias</div>
+              <div class="prompt-card-desc">Consultá alertas y condiciones especiales</div>
+            </div>
+            <div class="prompt-card" data-prompt="Necesito agregar una visita para Rocky por dificultad respiratoria">
+              <div class="prompt-card-title">Registrar visita</div>
+              <div class="prompt-card-desc">Agregá una nueva consulta a un paciente</div>
+            </div>
+            <div class="prompt-card" data-prompt="Cuáles son las vacunas pendientes de todos los pacientes?">
+              <div class="prompt-card-title">Vacunas pendientes</div>
+              <div class="prompt-card-desc">Verificá el calendario de vacunación</div>
+            </div>
+            <div class="prompt-card" data-prompt="Dame un resumen de todos los pacientes felinos">
+              <div class="prompt-card-title">Resumen por especie</div>
+              <div class="prompt-card-desc">Obtené estadísticas agrupadas</div>
+            </div>
+          </div>
+        </div>
+        <div class="messages" id="messagesContainer" style="display:none;"></div>
+      </div>
+
+      <div class="input-area">
+        <div class="input-wrap">
+          <div class="input-box">
+            <textarea class="input-text" id="chatInput" placeholder="Escribí tu consulta..." rows="1"></textarea>
+            <button class="btn-send" id="sendBtn" disabled>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+              </svg>
+            </button>
+          </div>
+          <div class="input-note">INNPET puede cometer errores. Verificá siempre la información clínica.</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- RECORDS PANEL -->
+  <div class="panel" id="recordsPanel">
+    <div class="panel-header">
+      <span class="panel-title">Historial clínico</span>
+      <button class="btn-icon" id="recordsPanelClose">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+    <div class="panel-body" id="recordsPanelBody">
+      <div class="empty-state">
+        <p>Seleccioná un paciente para ver su historial</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS MODAL -->
+  <div class="modal-bg" id="settingsModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h2>Configuración</h2>
+        <button class="btn-icon" id="closeSettingsBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg></button>
+      </div>
+      <div class="field">
+        <label>Supabase Project URL</label>
+        <input type="url" id="supabaseUrlInput" placeholder="https://xxxxx.supabase.co">
+      </div>
+      <div class="field">
+        <label>Supabase Anon Key</label>
+        <input type="text" id="supabaseKeyInput" placeholder="eyJhbGciOi...">
+      </div>
+      <div class="field">
+        <label>URL del Webhook (n8n)</label>
+        <input type="url" id="webhookInput" placeholder="https://tu-instancia/webhook/xxx">
+      </div>
+      <div class="field">
+        <label>Formato de solicitud</label>
+        <pre class="code-block">POST { "message": "texto", "sessionId": "id", "action": "sendMessage" }</pre>
+        <small>El webhook debe responder con: { "output": "respuesta" }</small>
+      </div>
+      <div class="modal-foot">
+        <button class="btn-ghost" id="cancelSettingsBtn">Cancelar</button>
+        <button class="btn-primary" id="saveSettingsBtn">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECORD FORM MODAL -->
+  <div class="modal-bg" id="recordFormModal">
+    <div class="modal modal-wide">
+      <div class="modal-head">
+        <h2 id="recordFormTitle">Nuevo paciente</h2>
+        <button class="btn-icon" id="closeRecordFormBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg></button>
+      </div>
+      <form id="recordForm">
+        <div class="form-section">Datos del paciente</div>
+        <div class="form-grid">
+          <div class="field"><label>Nombre *</label><input type="text" id="rf_name" required placeholder="Ej: Firulais">
+          </div>
+          <div class="field"><label>Especie *</label><select id="rf_species" required>
+              <option value="">Seleccionar</option>
+              <option value="Perro">Perro</option>
+              <option value="Gato">Gato</option>
+            </select></div>
+          <div class="field"><label>Raza</label><input type="text" id="rf_breed" placeholder="Ej: Labrador"></div>
+          <div class="field"><label>Edad</label><input type="text" id="rf_age" placeholder="Ej: 3 años"></div>
+          <div class="field"><label>Peso</label><input type="text" id="rf_weight" placeholder="Ej: 15 kg"></div>
+          <div class="field"><label>Sexo</label><input type="text" id="rf_sex" placeholder="Ej: Macho"></div>
+          <div class="field"><label>Color</label><input type="text" id="rf_color" placeholder="Ej: Negro"></div>
+          <div class="field"><label>Microchip</label><input type="text" id="rf_microchip" placeholder="Opcional"></div>
+        </div>
+        <div class="form-section">Propietario</div>
+        <div class="form-grid">
+          <div class="field"><label>Nombre</label><input type="text" id="rf_owner_name" placeholder="Ej: Juan Pérez">
+          </div>
+          <div class="field"><label>Teléfono</label><input type="text" id="rf_owner_phone"
+              placeholder="Ej: +54 11 5555-0000"></div>
+          <div class="field"><label>Email</label><input type="email" id="rf_owner_email"
+              placeholder="Ej: juan@email.com"></div>
+          <div class="field"><label>Dirección</label><input type="text" id="rf_owner_address"
+              placeholder="Ej: Av. Corrientes 123"></div>
+        </div>
+        <div class="form-section">Información médica</div>
+        <div class="field"><label>Alergias (separar con coma)</label><input type="text" id="rf_allergies"
+            placeholder="Ej: Pollo, Amoxicilina"></div>
+        <div class="field"><label>Condiciones preexistentes (separar con coma)</label><input type="text"
+            id="rf_conditions" placeholder="Ej: Displasia de cadera"></div>
+        <input type="hidden" id="rf_editId" value="">
+        <div class="modal-foot">
+          <button type="button" class="btn-ghost" id="cancelRecordFormBtn">Cancelar</button>
+          <button type="submit" class="btn-primary">Guardar paciente</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
