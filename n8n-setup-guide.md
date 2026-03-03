@@ -104,7 +104,7 @@ Agregar estas como sub-nodos de tipo **HTTP Request Tool** dentro del AI Agent.
 | Campo | Valor |
 |---|---|
 | Nombre | `crear_paciente` |
-| Descripción | `Crea un nuevo paciente. Requiere: id (formato PAT-XXX), name, species, breed, age, weight, sex, color, microchip, owner (objeto JSON con name, phone, email, address), allergies (array), conditions (array).` |
+| Descripción | `Crea un nuevo paciente. Requiere los datos del paciente en formato JSON.` |
 | Método | POST |
 | URL | `https://czagpuxrnucbpjcprwvs.supabase.co/rest/v1/clinical_records` |
 
@@ -117,7 +117,34 @@ Agregar estas como sub-nodos de tipo **HTTP Request Tool** dentro del AI Agent.
 | `Content-Type` | `application/json` |
 | `Prefer` | `return=representation` |
 
-**Body**: JSON con los campos del paciente.
+**Body** — JSON con esta estructura:
+
+```json
+{
+  "id": "PAT-007",
+  "name": "Firulais",
+  "species": "Perro",
+  "breed": "Labrador",
+  "age": "2 años",
+  "weight": "25 kg",
+  "sex": "Macho",
+  "color": "Negro",
+  "microchip": "",
+  "owner": {
+    "name": "Juan Pérez",
+    "phone": "+54 11 5555-0000",
+    "email": "juan@email.com",
+    "address": "Av. Corrientes 123, Buenos Aires"
+  },
+  "allergies": ["Pollo"],
+  "conditions": ["Displasia de cadera"],
+  "vaccinations": [],
+  "visits": [],
+  "lab_results": []
+}
+```
+
+El agente debe generar un ID correlativo (PAT-007, PAT-008, etc.) y completar los campos que el veterinario le fue dando en la conversación. Los campos `vaccinations`, `visits` y `lab_results` arrancan como arrays vacíos.
 
 ---
 
@@ -126,13 +153,39 @@ Agregar estas como sub-nodos de tipo **HTTP Request Tool** dentro del AI Agent.
 | Campo | Valor |
 |---|---|
 | Nombre | `actualizar_paciente` |
-| Descripción | `Actualiza datos de un paciente existente. Necesita el ID del paciente en la URL.` |
+| Descripción | `Actualiza datos de un paciente existente. Necesita el ID del paciente en la URL. Solo enviar los campos que cambien.` |
 | Método | PATCH |
 | URL | `https://czagpuxrnucbpjcprwvs.supabase.co/rest/v1/clinical_records?id=eq.{patient_id}` |
 
 **Headers**: los mismos 4 que crear_paciente.
 
-**Body**: JSON solo con los campos a actualizar.
+**Body** — JSON solo con los campos a actualizar. Ejemplos:
+
+Cambiar el peso:
+```json
+{
+  "weight": "28 kg"
+}
+```
+
+Agregar una alergia (hay que enviar el array completo):
+```json
+{
+  "allergies": ["Pollo", "Amoxicilina"]
+}
+```
+
+Actualizar datos del propietario:
+```json
+{
+  "owner": {
+    "name": "Juan Pérez",
+    "phone": "+54 11 5555-9999",
+    "email": "juan.nuevo@email.com",
+    "address": "Av. Santa Fe 500, Buenos Aires"
+  }
+}
+```
 
 ---
 
